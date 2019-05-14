@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 /**
  *
@@ -29,6 +30,9 @@ public class Grafos {
         int numeroArestas = grafos.numeroArestas(txt);
         int matrizAdjacencia[][] = grafos.matrizAdjacencia(txt, numeroVertices);
         int matrizIncidencia[][] = grafos.matrizIncidencia(txt, numeroVertices, numeroArestas);
+        int tipoGrafo = grafos.simplesPseudoMulti(numeroVertices, numeroArestas, matrizAdjacencia);
+        int completoIncompleto = grafos.completoIncompleto(tipoGrafo, numeroVertices, matrizAdjacencia);
+        int conexoDesconexo = grafos.conexoDesconeco(numeroVertices, matrizAdjacencia);
 
         String matrizAdjacenciaString = "";
         String matrizIncidenciaString = "";
@@ -67,7 +71,37 @@ public class Grafos {
         System.out.println("\n");
 
         /* Exibindo Se O Grafo é Simples, Pseudografo ou Multigrafo */
-        //grafos.simplesPseudoMulti(numeroVertices, matrizAdjacencia);
+        grafos.simplesPseudoMulti(numeroVertices, numeroArestas, matrizAdjacencia);
+
+        /* Exibindo O Tipo Do Grafo */
+        switch (tipoGrafo) {
+            case 0:
+                System.out.println("O Grafo é Simples!");
+                break;
+            case 1:
+                System.out.println("O Grafo é Pseudografo, possui laço!");
+                break;
+        }
+
+        /* Exibindo Se O Grafo é Completo ou Incompleto */
+        switch (completoIncompleto) {
+            case 0:
+                System.out.println("O Grafo é Incompleto!");
+                break;
+            case 1:
+                System.out.println("O Grafo é Completo!");
+                break;
+        }
+
+        /* Exibi Se O Grafo é Conexo ou Desconexo */
+        switch (conexoDesconexo) {
+            case 0:
+                System.out.println("O Grafo é Desconexo!");
+                break;
+            case 1:
+                System.out.println("O Grafo é Conexo!");
+                break;
+        }
     }
 
     public static void ordemTamanhoGrafo(int numeroVertices, int numeroArestas) {
@@ -246,22 +280,76 @@ public class Grafos {
 
     }
 
-    public static void simplesPseudoMulti(int numeroVertices, int[][] matrizAdjacencia) {
+    //Faltando MultiGrafo
+    public int simplesPseudoMulti(int numeroVertices, int numeroArestas, int[][] matrizAdjacencia) {
 
-        int tipo = 0;
         int diagonalDaMatriz = 0;
+        int tipoGrafo = 0;
 
         for (int i = 1; i <= numeroVertices; i++) {
             diagonalDaMatriz += matrizAdjacencia[i][i];
         }
 
         if (diagonalDaMatriz == 0) {
-            System.out.println("O Grafo é Simples!");
+            return 0;
         }
 
         if (diagonalDaMatriz > 0) {
-            System.out.println("O Grafo é Pseudografo, possui laço. A soma da Diagonal da Matriz de Adjacência é:" + diagonalDaMatriz);
+            return 1;
         }
+
+        return tipoGrafo;
+    }
+
+    public int completoIncompleto(int tipoGrafo, int numeroVertices, int[][] matrizAdjacencia) {
+
+        int completoIncompleto = 0;
+
+        if (tipoGrafo != 0) {
+            completoIncompleto = 0;
+        } else {
+            completoIncompleto = 1;
+
+        }
+
+        for (int i = 1; i <= numeroVertices; i++) { //printa matriz
+            for (int j = 1; j <= numeroVertices; j++) {
+                if (matrizAdjacencia[i][j] == 0 && i != j) {
+                    completoIncompleto = 0;
+
+                }
+            }
+        }
+
+        return completoIncompleto;
+
+    }
+
+    public int conexoDesconeco(int numeroVertices, int[][] matrizAdjacencia) {
+
+        int conexoDesconexo = 0;
+        int cont = 0;
+
+        conexoDesconexo = 1;
+
+        for (int i = 1; i <= numeroVertices; i++) {
+            matrizAdjacencia[i][i] = 0;
+        }
+
+        for (int i = 1; i <= numeroVertices; i++) {
+            for (int j = 1; j <= numeroVertices; j++) {
+                if (matrizAdjacencia[i][j] == 1) {
+                    cont++;
+                }
+            }
+        }
+
+        if ((cont / 2) < (numeroVertices - 1)) {
+            conexoDesconexo = 0;
+
+        }
+
+        return conexoDesconexo;
 
     }
 
