@@ -102,6 +102,10 @@ public class Grafos {
                 System.out.println("O Grafo é Conexo!");
                 break;
         }
+
+        /* Exibi Se O Grafo Possui Ciclo ou Não */
+        Grafos.ciclo(conexoDesconexo, tipoGrafo, numeroVertices, matrizAdjacencia);
+
     }
 
     public static void ordemTamanhoGrafo(int numeroVertices, int numeroArestas) {
@@ -312,7 +316,7 @@ public class Grafos {
 
         }
 
-        for (int i = 1; i <= numeroVertices; i++) { //printa matriz
+        for (int i = 1; i <= numeroVertices; i++) {
             for (int j = 1; j <= numeroVertices; j++) {
                 if (matrizAdjacencia[i][j] == 0 && i != j) {
                     completoIncompleto = 0;
@@ -350,6 +354,16 @@ public class Grafos {
         }
 
         return conexoDesconexo;
+
+    }
+
+    public static void ciclo(int conexoDesconexo, int tipoGrafo, int numeroVertices, int[][] matrizAdjacencia) {
+
+        if (conexoDesconexo != 1 || tipoGrafo != 0) {
+            System.out.println("O Grafo Não Possui Ciclo");
+        } else {
+            System.out.println("O Grafo Possui Ciclo");
+        }
 
     }
 
