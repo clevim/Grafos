@@ -21,6 +21,7 @@ public class Grafos {
 
         /* Nome do Arquivo Txt da Matrix */
         String txt = "grafo.txt";
+        String txtValorado = "grafoValorado.txt";
 
         /* Instanciando a classe */
         Grafos grafos = new Grafos();
@@ -29,6 +30,7 @@ public class Grafos {
         int numeroVertices = grafos.numeroVertices(txt);
         int numeroArestas = grafos.numeroArestas(txt);
         int matrizAdjacencia[][] = grafos.matrizAdjacencia(txt, numeroVertices);
+        int matrizAdjacenciaValorada[][] = grafos.matrizAdjacenciaValorada(txtValorado, numeroVertices);
         int matrizIncidencia[][] = grafos.matrizIncidencia(txt, numeroVertices, numeroArestas);
         int tipoGrafo = grafos.simplesPseudoMulti(numeroVertices, numeroArestas, matrizAdjacencia);
         int completoIncompleto = grafos.completoIncompleto(tipoGrafo, numeroVertices, matrizAdjacencia);
@@ -36,6 +38,7 @@ public class Grafos {
 
         String matrizAdjacenciaString = "";
         String matrizIncidenciaString = "";
+        String matrizAdjacenciaValoradaString = "";
 
 
         /* Exibindo Ordem e Tamanho */
@@ -51,6 +54,17 @@ public class Grafos {
             matrizAdjacenciaString += ("\n");
         }
         System.out.println(matrizAdjacenciaString);
+        System.out.println("\n");
+
+        /* Exibindo MatrizAdjacencia Valorada*/
+        System.out.println("Matriz de Adjacência Valorada:");
+        for (int i = 1; i <= numeroVertices; i++) {
+            for (int j = 1; j <= numeroVertices; j++) {
+                matrizAdjacenciaValoradaString += " " + matrizAdjacenciaValorada[i][j] + " ";
+            }
+            matrizAdjacenciaValoradaString += ("\n");
+        }
+        System.out.println(matrizAdjacenciaValoradaString);
         System.out.println("\n");
 
         /* Exibindo O Grau de Cada Vértice */
@@ -105,6 +119,10 @@ public class Grafos {
 
         /* Exibi Se O Grafo Possui Ciclo ou Não */
         Grafos.ciclo(conexoDesconexo, tipoGrafo, numeroVertices, matrizAdjacencia);
+        System.out.println("\n");
+
+        Grafos.dijkstra(matrizAdjacenciaValorada, 7, 1);
+        System.out.println("\n");
 
     }
 
@@ -197,6 +215,43 @@ public class Grafos {
                     int coluna = Integer.parseInt(caracteres[1]);
                     m[linha][coluna] = 1;
                     m[coluna][linha] = 1;
+
+                }
+
+            } while (lerLinha != null);
+        } catch (IOException | NumberFormatException e) {
+            System.out.println("ERROR: " + e);
+        }
+
+        return m;
+    }
+
+    public int[][] matrizAdjacenciaValorada(String txt, int numeroVertices) {
+
+        String[] caracteres;
+        int[][] m = new int[numeroVertices + 1][numeroVertices + 1];
+        String lerLinha;
+
+        try {
+
+            FileInputStream arquivo = new FileInputStream(txt);
+            BufferedReader d = new BufferedReader(new InputStreamReader(arquivo));
+
+            do {
+
+                lerLinha = d.readLine();
+
+                if (lerLinha != null) {
+
+                    caracteres = lerLinha.split(">");
+
+                    int linha = Integer.parseInt(caracteres[0]);
+                    int coluna = Integer.parseInt(caracteres[1]);
+
+                    lerLinha = d.readLine();
+
+                    m[linha][coluna] = Integer.parseInt(lerLinha);
+                    m[coluna][linha] = Integer.parseInt(lerLinha);
 
                 }
 
@@ -365,6 +420,75 @@ public class Grafos {
             System.out.println("O Grafo Possui Ciclo");
         }
 
+    }
+
+    public static void dijkstra(int[][] matrizAdjacenciaValorada, int numeroVertices, int verticeInicial) {
+
+        final int MAX = 1000;
+        final int INFINITY = 99999;
+
+        int[][] cost = new int[MAX][MAX];
+        int[] distancia = new int[MAX];
+        int[] ant = new int[MAX];
+        int[] visited = new int[MAX];
+        int count, mindistancia, nextnode;
+        nextnode = 0;
+
+        for (int i = 0; i < numeroVertices; i++) {
+            for (int j = 0; j < numeroVertices; j++) {
+                if (matrizAdjacenciaValorada[i][j] == 0) {
+                    cost[i][j] = INFINITY;
+                } else {
+                    cost[i][j] = matrizAdjacenciaValorada[i][j];
+                }
+            }
+        }
+
+        for (int i = 0; i < numeroVertices; i++) {
+            distancia[i] = cost[verticeInicial][i];
+            ant[i] = verticeInicial;
+            visited[i] = 0;
+        }
+
+        distancia[verticeInicial] = 0;
+        visited[verticeInicial] = 1;
+        count = 1;
+
+        while (count < numeroVertices - 1) {
+
+            mindistancia = INFINITY;
+
+            for (int i = 0; i < numeroVertices; i++) {
+                if ((distancia[i] < mindistancia) && (visited[i] != 1)) {
+                    mindistancia = distancia[i];
+                    nextnode = i;
+                }
+            }
+
+            visited[nextnode] = 1;
+            for (int i = 0; i < numeroVertices; i++) {
+                if (visited[i] != 1) {
+                    if (mindistancia + cost[nextnode][i] < distancia[i]) {
+                        distancia[i] = mindistancia + cost[nextnode][i];
+                        ant[i] = nextnode;
+                    }
+                }
+            }
+
+            count++;
+        }
+
+        for (int i = 1; i < numeroVertices; i++) {
+            if (i != verticeInicial) {
+                System.out.print("\nDistancia do nó: " + i + " = " + distancia[i]);
+                System.out.print("\nCaminho=" + i);
+                int j = i;
+                do {
+                    j = ant[j];
+                    System.out.print("->" + j);
+                } while (j != verticeInicial);
+            }
+        }
     }
 
 }
