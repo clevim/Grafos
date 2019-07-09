@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  *
@@ -39,7 +40,6 @@ public class Grafos {
         String matrizAdjacenciaString = "";
         String matrizIncidenciaString = "";
         String matrizAdjacenciaValoradaString = "";
-
 
         /* Exibindo Ordem e Tamanho */
         Grafos.ordemTamanhoGrafo(numeroVertices, numeroArestas);
@@ -121,7 +121,17 @@ public class Grafos {
         Grafos.ciclo(conexoDesconexo, tipoGrafo, numeroVertices, matrizAdjacencia);
         System.out.println("\n");
 
-        Grafos.dijkstra(matrizAdjacenciaValorada, 7, 1);
+        /* Exibir menor caminho */
+        Grafos.dijkstra(matrizAdjacenciaValorada, numeroVertices, 1);
+        System.out.println("\n");
+
+        /* Matriz de Custo Minimo */
+        Grafos.custoMinimo(matrizAdjacenciaValorada, numeroVertices);
+        System.out.println("\n");
+
+
+        /* Exibir arvore geradora minima */
+        Grafos.kruskal(matrizAdjacenciaValorada, numeroVertices);
         System.out.println("\n");
 
     }
@@ -426,8 +436,10 @@ public class Grafos {
 
         final int MAX = 1000;
         final int INFINITY = 99999;
+        numeroVertices = numeroVertices + 1;
 
         int[][] cost = new int[MAX][MAX];
+        ;
         int[] distancia = new int[MAX];
         int[] ant = new int[MAX];
         int[] visited = new int[MAX];
@@ -489,6 +501,143 @@ public class Grafos {
                 } while (j != verticeInicial);
             }
         }
+
+    }
+
+    public static void custoMinimo(int[][] matrizAdjacenciaValorada, int numeroVertices) {
+
+        int[][] matrizCustoMinimo = new int[1000][1000];
+        String matrizCustoMinimoString = "";
+
+        numeroVertices = numeroVertices + 1;
+        for (int verticeInicial = 1; verticeInicial < numeroVertices; verticeInicial++) {
+
+            final int MAX = 1000;
+            final int INFINITY = 99999;
+
+            int[][] cost = new int[MAX][MAX];
+            int[] distancia = new int[MAX];
+            int[] ant = new int[MAX];
+            int[] visited = new int[MAX];
+            int count, mindistancia, nextnode;
+            nextnode = 0;
+
+            for (int i = 0; i < numeroVertices; i++) {
+                for (int j = 0; j < numeroVertices; j++) {
+                    if (matrizAdjacenciaValorada[i][j] == 0) {
+                        cost[i][j] = INFINITY;
+                    } else {
+                        cost[i][j] = matrizAdjacenciaValorada[i][j];
+                    }
+                }
+            }
+
+            for (int i = 0; i < numeroVertices; i++) {
+                distancia[i] = cost[verticeInicial][i];
+                ant[i] = verticeInicial;
+                visited[i] = 0;
+            }
+
+            distancia[verticeInicial] = 0;
+            visited[verticeInicial] = 1;
+            count = 1;
+
+            while (count < numeroVertices - 1) {
+
+                mindistancia = INFINITY;
+
+                for (int i = 0; i < numeroVertices; i++) {
+                    if ((distancia[i] < mindistancia) && (visited[i] != 1)) {
+                        mindistancia = distancia[i];
+                        nextnode = i;
+                    }
+                }
+
+                visited[nextnode] = 1;
+                for (int i = 0; i < numeroVertices; i++) {
+                    if (visited[i] != 1) {
+                        if (mindistancia + cost[nextnode][i] < distancia[i]) {
+                            distancia[i] = mindistancia + cost[nextnode][i];
+                            ant[i] = nextnode;
+                        }
+                    }
+                }
+
+                count++;
+            }
+
+            for (int i = 1; i < numeroVertices; i++) {
+                if (i != verticeInicial) {
+                    matrizCustoMinimo[verticeInicial][i] = distancia[i];
+                    matrizCustoMinimo[i][verticeInicial] = distancia[i];
+
+                    int j = i;
+                    do {
+                        j = ant[j];
+                    } while (j != verticeInicial);
+                }
+            }
+
+        }
+
+        System.out.println("Matriz de Custo Minimo:");
+        for (int i = 1; i < numeroVertices; i++) {
+            for (int j = 1; j < numeroVertices; j++) {
+                matrizCustoMinimoString += " " + matrizCustoMinimo[i][j] + " ";
+            }
+            matrizCustoMinimoString += ("\n");
+        }
+        System.out.println(matrizCustoMinimoString);
+        System.out.println("\n");
+
+    }
+
+    public static void kruskal(int[][] matrizAdjacenciaValorada, int numeroVertices) {
+
+        int[] parente = new int[numeroVertices + 1];
+        int numeroDeArestas = 1;
+        int u = 0, v = 0, min, total = 0;
+        int x, y;
+
+        for (int i = 1; i <= numeroVertices; ++i) {
+            parente[i] = 0;
+            for (int j = 1; j <= numeroVertices; ++j) {
+                if (matrizAdjacenciaValorada[i][j] == 0) {
+                    matrizAdjacenciaValorada[i][j] = 99999;
+                }
+            }
+        }
+        while (numeroDeArestas < numeroVertices) {
+            min = 99999;
+            for (int i = 1; i <= numeroVertices; ++i) {
+                for (int j = 1; j <= numeroVertices; ++j) {
+                    if (matrizAdjacenciaValorada[i][j] < min) {
+                        min = matrizAdjacenciaValorada[i][j];
+                        u = i;
+                        v = j;
+                    }
+                }
+            }
+            x = u;
+            y = v;
+            while (parente[x] != 0) {
+                x = parente[x];
+            }
+
+            while (parente[y] != 0) {
+                y = parente[y];
+            }
+
+            if (x != y) {
+                numeroDeArestas++;
+                System.out.println("O Peso da Aresta (" + (u) + "," + (v) + ") é " + min);
+                total += min;
+                parente[v] = u;
+            }
+            matrizAdjacenciaValorada[u][v] = matrizAdjacenciaValorada[v][u] = 99999;
+        }
+        System.out.println("O peso da árvore geradora mínima é " + total);
+
     }
 
 }
