@@ -134,6 +134,15 @@ public class Grafos {
         Grafos.kruskal(matrizAdjacenciaValorada, numeroVertices);
         System.out.println("\n");
 
+        /* Fecho Transitivo */
+        String fechoTransitivo = grafos.fechoTransitivo(matrizAdjacencia, numeroVertices);
+        System.out.println("Fecho Transitivo:");
+        System.out.println("\n");
+
+        System.out.println(fechoTransitivo);
+
+        System.out.println("\n");
+
     }
 
     public static void ordemTamanhoGrafo(int numeroVertices, int numeroArestas) {
@@ -179,7 +188,6 @@ public class Grafos {
     public int numeroArestas(String txt) {
 
         int numeroArestas = 0;
-        String[] caracteres;
         String lerLinha;
 
         try {
@@ -638,6 +646,24 @@ public class Grafos {
         }
         System.out.println("O peso da árvore geradora mínima é " + total);
 
+    }
+
+    public String fechoTransitivo(int[][] matrizAdjacencia, int vertices) {
+
+        String fechoTransitivo = "";
+
+        for (int k = 1; k <= vertices; k++) {
+            fechoTransitivo += "W" + k + "=" + "\r\n";
+
+            for (int i = 1; i <= vertices; i++) {
+                for (int j = 1; j <= vertices; j++) {
+                    matrizAdjacencia[i][j] = matrizAdjacencia[i][j] != 0 || (matrizAdjacencia[i][k] != 0 && matrizAdjacencia[k][j] != 0) ? 1 : 0;
+                    fechoTransitivo += "" + matrizAdjacencia[i][j];
+                }
+                fechoTransitivo += "\r\n";
+            }
+        }
+        return fechoTransitivo;
     }
 
 }
